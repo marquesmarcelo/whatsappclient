@@ -7,7 +7,7 @@ const logger = new loggerConfig().getLogger();
 
 venom
   .create({
-    //headless: false, //mostrar o navegador aberto
+    headless: false, //mostrar o navegador aberto
     session: 'whatsappclient',
     multidevice: true // para versão não multidispositivo, use false.(default: true)
   })
@@ -22,7 +22,8 @@ venom
  * @param {client} client - Cliente que será utilizado para enviar as mensagens
  */ 
 function start(client) {
-  var linesCount = 0;
+  var total = 0;
+  var lineCount = 0;
   const message = getMessage();  
   const rl = getPhones();
   rl.on('line', function (line) {
@@ -31,13 +32,15 @@ function start(client) {
       
       const number = cleanNumber+'@c.us';
       client.sendText(number, message).then(response => {
-        logger.info(number, true);
+		lineCount++;
+        logger.info(lineCount, number, true);
         }).catch(err => {
-            logger.error(number,false, err.text)
+			lineCount++;
+            logger.error(lineCount, number,false, err.text)
         })
-        linesCount++;
+        total++;
   });
   rl.on('close', function () {
-    logger.info('Enviando '+linesCount +' mensagens.');
+    logger.info('Enviando '+total +' mensagens.');
   });
 }
